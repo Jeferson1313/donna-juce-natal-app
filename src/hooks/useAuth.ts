@@ -7,6 +7,7 @@ export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminCheckComplete, setAdminCheckComplete] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -14,15 +15,17 @@ export function useAuth() {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setLoading(false);
 
         // Check admin status with setTimeout to avoid deadlock
         if (session?.user) {
+          setAdminCheckComplete(false);
           setTimeout(() => {
             checkAdminStatus(session.user.id);
           }, 0);
         } else {
           setIsAdmin(false);
+          setAdminCheckComplete(true);
+          setLoading(false);
         }
       }
     );
@@ -31,10 +34,12 @@ export function useAuth() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      setLoading(false);
 
       if (session?.user) {
         checkAdminStatus(session.user.id);
+      } else {
+        setAdminCheckComplete(true);
+        setLoading(false);
       }
     });
 
@@ -47,6 +52,8 @@ export function useAuth() {
     });
 
     setIsAdmin(data === true && !error);
+    setAdminCheckComplete(true);
+    setLoading(false);
   };
 
   const signIn = async (email: string, password: string) => {
@@ -80,6 +87,7 @@ export function useAuth() {
     session,
     loading,
     isAdmin,
+    adminCheckComplete,
     signIn,
     signUp,
     signOut,
