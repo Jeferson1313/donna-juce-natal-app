@@ -13,15 +13,18 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, user, isAdmin, loading } = useAuth();
+  const [hasShownDenied, setHasShownDenied] = useState(false);
+  const { signIn, user, isAdmin, loading, adminCheckComplete } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!loading && user) {
+    // Only act when loading is done AND admin check is complete
+    if (!loading && adminCheckComplete && user) {
       if (isAdmin) {
         navigate("/admin");
-      } else {
+      } else if (!hasShownDenied) {
+        setHasShownDenied(true);
         toast({
           title: "Acesso negado",
           description: "Você não tem permissão de administrador.",
@@ -29,11 +32,12 @@ export default function AdminLogin() {
         });
       }
     }
-  }, [user, isAdmin, loading, navigate, toast]);
+  }, [user, isAdmin, loading, adminCheckComplete, navigate, hasShownDenied]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setHasShownDenied(false);
 
     const { error } = await signIn(email, password);
     if (error) {
@@ -47,7 +51,7 @@ export default function AdminLogin() {
     setIsLoading(false);
   };
 
-  if (loading) {
+  if (loading || (user && !adminCheckComplete)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
