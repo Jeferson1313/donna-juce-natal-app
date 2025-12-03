@@ -9,7 +9,6 @@ import { CustomerAuthModal } from "@/components/CustomerAuthModal";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { toProductDisplay } from "@/types/product";
-import { sampleProducts, categories as defaultCategories } from "@/data/products";
 import { Gift, Snowflake, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -24,15 +23,13 @@ const Catalog = () => {
   const { data: dbProducts, isLoading } = useProducts();
   const { isAuthenticated, customer, signOut } = useCustomerAuth();
 
-  // Use database products if available, otherwise use sample products
-  const products = dbProducts && dbProducts.length > 0
-    ? dbProducts.map(toProductDisplay)
-    : sampleProducts;
+  // Use only database products
+  const products = dbProducts ? dbProducts.map(toProductDisplay) : [];
 
   // Get categories from products
   const categories = dbProducts && dbProducts.length > 0
     ? ["Todos", ...new Set(dbProducts.map(p => p.category))]
-    : defaultCategories;
+    : ["Todos"];
 
   const filteredProducts = selectedCategory === "Todos"
     ? products
