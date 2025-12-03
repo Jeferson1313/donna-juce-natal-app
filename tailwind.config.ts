@@ -71,8 +71,9 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        display: ["Playfair Display", "serif"],
-        body: ["Poppins", "sans-serif"],
+        display: ["Plus Jakarta Sans", "sans-serif"],
+        body: ["DM Sans", "sans-serif"],
+        sans: ["DM Sans", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
