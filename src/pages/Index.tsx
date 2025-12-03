@@ -4,17 +4,30 @@ import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductCard, Product } from "@/components/ProductCard";
 import { ReservationModal } from "@/components/ReservationModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { sampleProducts, categories } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
+import { toProductDisplay } from "@/types/product";
+import { sampleProducts, categories as defaultCategories } from "@/data/products";
 import { Gift, Snowflake } from "lucide-react";
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data: dbProducts, isLoading } = useProducts();
+
+  // Use database products if available, otherwise use sample products
+  const products = dbProducts && dbProducts.length > 0
+    ? dbProducts.map(toProductDisplay)
+    : sampleProducts;
+
+  // Get categories from products
+  const categories = dbProducts && dbProducts.length > 0
+    ? ["Todos", ...new Set(dbProducts.map(p => p.category))]
+    : defaultCategories;
 
   const filteredProducts = selectedCategory === "Todos"
-    ? sampleProducts
-    : sampleProducts.filter((p) => p.category === selectedCategory);
+    ? products
+    : products.filter((p) => p.category === selectedCategory);
 
   const handleReserve = (product: Product) => {
     setSelectedProduct(product);
@@ -67,17 +80,32 @@ const Index = () => {
 
         {/* Products Grid */}
         <section className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product, index) => (
-              <div
-                key={product.id}
-                className="animate-fade-in"
-                style={{ animationDelay: `${0.1 * index}s` }}
-              >
-                <ProductCard product={product} onReserve={handleReserve} />
-              </div>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-card rounded-2xl overflow-hidden animate-pulse">
+                  <div className="aspect-square bg-muted" />
+                  <div className="p-4 space-y-3">
+                    <div className="h-5 bg-muted rounded w-3/4" />
+                    <div className="h-4 bg-muted rounded w-full" />
+                    <div className="h-8 bg-muted rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${0.1 * index}s` }}
+                >
+                  <ProductCard product={product} onReserve={handleReserve} />
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Footer Info */}
