@@ -1,19 +1,28 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductCard, Product } from "@/components/ProductCard";
 import { ReservationModal } from "@/components/ReservationModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { CustomerAuthModal } from "@/components/CustomerAuthModal";
 import { useProducts } from "@/hooks/useProducts";
+import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { toProductDisplay } from "@/types/product";
 import { sampleProducts, categories as defaultCategories } from "@/data/products";
-import { Gift, Snowflake } from "lucide-react";
+import { Gift, Snowflake, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const Index = () => {
+const Catalog = () => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [pendingProduct, setPendingProduct] = useState<Product | null>(null);
+
   const { data: dbProducts, isLoading } = useProducts();
+  const { isAuthenticated, customer, signOut } = useCustomerAuth();
 
   // Use database products if available, otherwise use sample products
   const products = dbProducts && dbProducts.length > 0
@@ -30,13 +39,52 @@ const Index = () => {
     : products.filter((p) => p.category === selectedCategory);
 
   const handleReserve = (product: Product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
+    if (!isAuthenticated) {
+      setPendingProduct(product);
+      setIsAuthModalOpen(true);
+    } else {
+      setSelectedProduct(product);
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    setIsAuthModalOpen(false);
+    if (pendingProduct) {
+      setSelectedProduct(pendingProduct);
+      setIsModalOpen(true);
+      setPendingProduct(null);
+    }
   };
 
   return (
     <div className="min-h-screen bg-background gradient-festive">
-      <Header />
+      {/* Simple Header */}
+      <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-30">
+        <div className="container py-4 flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar
+          </Button>
+          <h1 className="font-display text-lg font-semibold text-foreground">
+            DONNA JUCE AÇOUGUE
+          </h1>
+          {isAuthenticated && customer ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground hidden sm:block">
+                Olá, {customer.name.split(" ")[0]}
+              </span>
+              <Button variant="outline" size="sm" onClick={signOut}>
+                Sair
+              </Button>
+            </div>
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => setIsAuthModalOpen(true)}>
+              Entrar
+            </Button>
+          )}
+        </div>
+      </header>
 
       <main className="container py-6 space-y-8">
         {/* Hero Carousel */}
@@ -127,6 +175,16 @@ const Index = () => {
       {/* WhatsApp Button */}
       <WhatsAppButton phoneNumber="5500000000000" />
 
+      {/* Customer Auth Modal */}
+      <CustomerAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => {
+          setIsAuthModalOpen(false);
+          setPendingProduct(null);
+        }}
+        onSuccess={handleAuthSuccess}
+      />
+
       {/* Reservation Modal */}
       <ReservationModal
         product={selectedProduct}
@@ -140,4 +198,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Catalog;
