@@ -237,7 +237,7 @@ export default function Admin() {
                           id="title"
                           value={formData.title}
                           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                          placeholder="Ex: Catálogo de Natal 2024"
+                          placeholder="Ex: Catálogo de Natal 2025"
                           required
                         />
                       </div>

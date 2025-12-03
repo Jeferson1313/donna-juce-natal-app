@@ -166,7 +166,7 @@ const Catalog = () => {
               DONNA JUCE AÇOUGUE
             </p>
             <p className="text-muted-foreground text-xs">
-              © 2024 - Todos os direitos reservados
+              © 2025 - Todos os direitos reservados
             </p>
           </div>
         </section>
