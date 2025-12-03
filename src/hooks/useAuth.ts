@@ -42,13 +42,11 @@ export function useAuth() {
   }, []);
 
   const checkAdminStatus = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("admin_users")
-      .select("id")
-      .eq("user_id", userId)
-      .maybeSingle();
+    const { data, error } = await supabase.rpc("is_admin", {
+      _user_id: userId,
+    });
 
-    setIsAdmin(!!data && !error);
+    setIsAdmin(data === true && !error);
   };
 
   const signIn = async (email: string, password: string) => {
