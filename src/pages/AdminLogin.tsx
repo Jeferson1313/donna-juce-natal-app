@@ -13,7 +13,8 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, user, isAdmin, loading } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp, user, isAdmin, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -35,13 +36,30 @@ export default function AdminLogin() {
     e.preventDefault();
     setIsLoading(true);
 
-    const { error } = await signIn(email, password);
-    if (error) {
-      toast({
-        title: "Erro ao entrar",
-        description: error.message,
-        variant: "destructive",
-      });
+    if (isSignUp) {
+      const { error } = await signUp(email, password);
+      if (error) {
+        toast({
+          title: "Erro ao cadastrar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Conta criada!",
+          description: "Agora faça login com suas credenciais.",
+        });
+        setIsSignUp(false);
+      }
+    } else {
+      const { error } = await signIn(email, password);
+      if (error) {
+        toast({
+          title: "Erro ao entrar",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     }
 
     setIsLoading(false);
@@ -76,7 +94,7 @@ export default function AdminLogin() {
             Área Administrativa
           </CardTitle>
           <CardDescription>
-            Acesso restrito. Entre com suas credenciais.
+            {isSignUp ? "Criar conta de administrador" : "Acesso restrito. Entre com suas credenciais."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -105,7 +123,15 @@ export default function AdminLogin() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Aguarde..." : "Entrar"}
+              {isLoading ? "Aguarde..." : isSignUp ? "Cadastrar" : "Entrar"}
+            </Button>
+            <Button 
+              type="button" 
+              variant="link" 
+              className="w-full"
+              onClick={() => setIsSignUp(!isSignUp)}
+            >
+              {isSignUp ? "Já tenho conta" : "Criar conta"}
             </Button>
           </form>
         </CardContent>
