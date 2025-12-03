@@ -1,0 +1,135 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { Lock, UserPlus } from "lucide-react";
+import logo from "@/assets/logo.png";
+
+export default function AdminLogin() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { signIn, signUp, user, isAdmin, loading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!loading && user) {
+      if (isAdmin) {
+        navigate("/admin");
+      } else {
+        toast({
+          title: "Acesso negado",
+          description: "Você não tem permissão de administrador.",
+          variant: "destructive",
+        });
+      }
+    }
+  }, [user, isAdmin, loading, navigate, toast]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    if (isSignUp) {
+      const { error } = await signUp(email, password);
+      if (error) {
+        toast({
+          title: "Erro ao cadastrar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Conta criada!",
+          description: "Entre em contato com o administrador para liberar o acesso.",
+        });
+        setIsSignUp(false);
+      }
+    } else {
+      const { error } = await signIn(email, password);
+      if (error) {
+        toast({
+          title: "Erro ao entrar",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    }
+
+    setIsLoading(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background gradient-festive p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img src={logo} alt="Donna Juce Açougue" className="h-20 w-auto" />
+          </div>
+          <CardTitle className="flex items-center justify-center gap-2">
+            {isSignUp ? <UserPlus className="h-5 w-5" /> : <Lock className="h-5 w-5" />}
+            {isSignUp ? "Criar Conta" : "Área Administrativa"}
+          </CardTitle>
+          <CardDescription>
+            {isSignUp
+              ? "Crie sua conta para solicitar acesso ao painel"
+              : "Entre com suas credenciais para gerenciar o catálogo"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Aguarde..." : isSignUp ? "Criar Conta" : "Entrar"}
+            </Button>
+          </form>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              className="text-sm text-muted-foreground hover:text-primary underline"
+              onClick={() => setIsSignUp(!isSignUp)}
+            >
+              {isSignUp ? "Já tenho conta, quero entrar" : "Não tenho conta, criar uma"}
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
