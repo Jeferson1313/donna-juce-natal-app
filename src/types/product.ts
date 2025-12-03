@@ -8,6 +8,8 @@ export interface Product {
   category: string;
   is_available: boolean;
   order: number;
+  reservation_type: string;
+  reservation_date: string | null;
   created_at: string;
   updated_at: string;
 }

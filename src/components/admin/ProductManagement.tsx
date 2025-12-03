@@ -31,6 +31,8 @@ export function ProductManagement() {
     category: DEFAULT_CATEGORIES[0],
     image_url: "",
     is_available: true,
+    reservation_type: "any_day",
+    reservation_date: "",
   });
   const [uploading, setUploading] = useState(false);
 
@@ -80,6 +82,8 @@ export function ProductManagement() {
       category: product.category,
       image_url: product.image_url || "",
       is_available: product.is_available,
+      reservation_type: product.reservation_type,
+      reservation_date: product.reservation_date || "",
     });
     setIsDialogOpen(true);
   };
@@ -94,6 +98,8 @@ export function ProductManagement() {
       category: DEFAULT_CATEGORIES[0],
       image_url: "",
       is_available: true,
+      reservation_type: "any_day",
+      reservation_date: "",
     });
     setIsDialogOpen(true);
   };
@@ -121,6 +127,8 @@ export function ProductManagement() {
           category: formData.category,
           image_url: formData.image_url || null,
           is_available: formData.is_available,
+          reservation_type: formData.reservation_type,
+          reservation_date: formData.reservation_type === "specific_day" ? formData.reservation_date : null,
         });
         toast({ title: "Produto atualizado!" });
       } else {
@@ -134,6 +142,8 @@ export function ProductManagement() {
           image_url: formData.image_url || null,
           is_available: formData.is_available,
           order: maxOrder + 1,
+          reservation_type: formData.reservation_type,
+          reservation_date: formData.reservation_type === "specific_day" ? formData.reservation_date : null,
         });
         toast({ title: "Produto criado!" });
       }
@@ -260,6 +270,29 @@ export function ProductManagement() {
                   />
                 )}
               </div>
+              <div className="space-y-2">
+                <Label>Tipo de Reserva</Label>
+                <select
+                  value={formData.reservation_type}
+                  onChange={(e) => setFormData({ ...formData, reservation_type: e.target.value, reservation_date: "" })}
+                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                >
+                  <option value="any_day">Qualquer dia</option>
+                  <option value="specific_day">Dia específico</option>
+                </select>
+              </div>
+              {formData.reservation_type === "specific_day" && (
+                <div className="space-y-2">
+                  <Label htmlFor="reservation_date">Data da Reserva *</Label>
+                  <Input
+                    id="reservation_date"
+                    type="date"
+                    value={formData.reservation_date}
+                    onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
+                    required
+                  />
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Switch
                   checked={formData.is_available}

@@ -106,6 +106,8 @@ export type Database = {
           name: string
           order: number
           price: number
+          reservation_date: string | null
+          reservation_type: string
           unit: string
           updated_at: string
         }
@@ -119,6 +121,8 @@ export type Database = {
           name: string
           order?: number
           price: number
+          reservation_date?: string | null
+          reservation_type?: string
           unit?: string
           updated_at?: string
         }
@@ -132,6 +136,8 @@ export type Database = {
           name?: string
           order?: number
           price?: number
+          reservation_date?: string | null
+          reservation_type?: string
           unit?: string
           updated_at?: string
         }
