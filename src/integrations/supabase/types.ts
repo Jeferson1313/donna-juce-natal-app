@@ -71,6 +71,30 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          phone: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          phone: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          phone?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
@@ -112,6 +136,95 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      reservation_items: {
+        Row: {
+          created_at: string
+          id: string
+          price_at_time: number
+          product_id: string | null
+          product_name: string
+          quantity: number
+          reservation_id: string
+          unit: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          price_at_time: number
+          product_id?: string | null
+          product_name: string
+          quantity?: number
+          reservation_id: string
+          unit?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          price_at_time?: number
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          reservation_id?: string
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservation_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservation_items_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reservations: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          notes: string | null
+          pickup_date: string | null
+          pickup_time: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          notes?: string | null
+          pickup_date?: string | null
+          pickup_time?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          notes?: string | null
+          pickup_date?: string | null
+          pickup_time?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
