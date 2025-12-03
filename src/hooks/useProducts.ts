@@ -30,6 +30,8 @@ export function useCreateProduct() {
       category: string;
       is_available?: boolean;
       order?: number;
+      reservation_type: string;
+      reservation_date?: string | null;
     }) => {
       const { data, error } = await supabase
         .from("products")
