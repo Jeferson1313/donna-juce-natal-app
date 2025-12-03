@@ -6,7 +6,7 @@ import heroBanner1 from "@/assets/hero-banner.jpg";
 import heroBanner2 from "@/assets/hero-banner-2.jpg";
 
 const defaultSlides = [
-  { id: "1", title: "Catálogo de Natal 2024", subtitle: "As melhores carnes para sua ceia de Natal", image_url: heroBanner1 },
+  { id: "1", title: "Catálogo de Natal 2025", subtitle: "As melhores carnes para sua ceia de Natal", image_url: heroBanner1 },
   { id: "2", title: "Reserve Já!", subtitle: "Garanta seus produtos para o Natal", image_url: heroBanner2 },
 ];
 
@@ -98,7 +98,7 @@ export function HeroCarousel() {
       {/* Overlay Content */}
       <div className="absolute bottom-8 left-8 right-8 text-center md:text-left">
         <h2 className="font-display text-2xl md:text-4xl lg:text-5xl font-bold text-card drop-shadow-lg">
-          {slides[currentIndex]?.title || "Catálogo de Natal 2024"}
+          {slides[currentIndex]?.title || "Catálogo de Natal 2025"}
         </h2>
         <p className="text-card/90 mt-2 text-sm md:text-base max-w-xl drop-shadow">
           {slides[currentIndex]?.subtitle || "As melhores carnes para sua ceia de Natal"}

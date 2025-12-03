@@ -17,7 +17,7 @@ export default function Landing() {
             DONNA JUCE AÇOUGUE
           </h1>
           <p className="text-muted-foreground">
-            Catálogo de Natal 2024 - Reserve suas carnes para a ceia!
+            Catálogo de Natal 2025 - Reserve suas carnes para a ceia!
           </p>
         </div>
 
@@ -64,7 +64,7 @@ export default function Landing() {
 
         {/* Footer */}
         <p className="text-center text-muted-foreground text-xs">
-          © 2024 Donna Juce Açougue - Todos os direitos reservados
+          © 2025 Donna Juce Açougue - Todos os direitos reservados
         </p>
       </div>
     </div>
