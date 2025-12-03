@@ -72,7 +72,7 @@ export default {
       },
       fontFamily: {
         display: ["Playfair Display", "serif"],
-        body: ["Inter", "sans-serif"],
+        body: ["Poppins", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
