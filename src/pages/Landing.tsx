@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingBag, Settings } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-extended.png";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -12,10 +12,7 @@ export default function Landing() {
       <div className="w-full max-w-lg space-y-8">
         {/* Logo and Title */}
         <div className="text-center space-y-4">
-          <img src={logo} alt="Donna Juce Açougue" className="h-24 w-auto mx-auto" />
-          <h1 className="font-display text-3xl font-bold text-foreground">
-            DONNA JUCE AÇOUGUE
-          </h1>
+          <img src={logo} alt="Donna Juce Açougue" className="h-32 w-auto mx-auto" />
           <p className="text-muted-foreground">
             Catálogo de Natal 2025 - Reserve suas carnes para a ceia!
           </p>
