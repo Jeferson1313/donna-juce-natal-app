@@ -10,7 +10,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { toProductDisplay } from "@/types/product";
 import { Gift, Snowflake } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-extended.png";
 
 const Catalog = () => {
   const navigate = useNavigate();
@@ -60,12 +60,7 @@ const Catalog = () => {
       <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-30">
         <div className="container py-4 flex items-center justify-between">
           <CatalogSidebar onOpenAuth={() => setIsAuthModalOpen(true)} />
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Donna Juce Açougue" className="h-10 w-auto" />
-            <h1 className="font-display text-lg font-semibold text-foreground hidden sm:block">
-              DONNA JUCE AÇOUGUE
-            </h1>
-          </div>
+          <img src={logo} alt="Donna Juce Açougue" className="h-12 w-auto" />
           <div className="w-10" /> {/* Spacer for centering */}
         </div>
       </header>

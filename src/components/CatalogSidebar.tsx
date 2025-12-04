@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Menu, Home, ShoppingBag, LogIn, LogOut, User } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-extended.png";
 
 interface CatalogSidebarProps {
   onOpenAuth: () => void;
@@ -28,12 +28,8 @@ export function CatalogSidebar({ onOpenAuth }: CatalogSidebarProps) {
       </SheetTrigger>
       <SheetContent side="left" className="w-72 p-0">
         <SheetHeader className="p-6 pb-4">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Logo" className="h-12 w-auto shrink-0" />
-            <SheetTitle className="font-display text-base leading-tight text-left">
-              DONNA JUCE AÇOUGUE
-            </SheetTitle>
-          </div>
+          <SheetTitle className="sr-only">Menu</SheetTitle>
+          <img src={logo} alt="Donna Juce Açougue" className="h-16 w-auto" />
         </SheetHeader>
 
         {/* User Info */}
