@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductCard, Product } from "@/components/ProductCard";
 import { ReservationModal } from "@/components/ReservationModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CustomerAuthModal } from "@/components/CustomerAuthModal";
 import { CatalogSidebar } from "@/components/CatalogSidebar";
+import { CartIcon } from "@/components/CartIcon";
+import { AddToCartModal } from "@/components/AddToCartModal";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { toProductDisplay } from "@/types/product";
@@ -13,12 +14,20 @@ import { Gift, Snowflake, ShoppingCart, Calendar } from "lucide-react";
 import logo from "@/assets/logo-extended.png";
 
 const Catalog = () => {
-  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [pendingProduct, setPendingProduct] = useState<Product | null>(null);
+  const [pendingAction, setPendingAction] = useState<"reserve" | "cart" | null>(null);
+  const [cartModalProduct, setCartModalProduct] = useState<{
+    id: string;
+    name: string;
+    price: number;
+    unit: string;
+    image_url?: string;
+  } | null>(null);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
 
   const { data: dbProducts, isLoading } = useProducts();
   const { isAuthenticated } = useCustomerAuth();
@@ -40,33 +49,61 @@ const Catalog = () => {
   const immediateProducts = filteredProducts.filter((p) => p.availability_type === "immediate");
   const reservationProducts = filteredProducts.filter((p) => p.availability_type !== "immediate");
 
-  const handleReserve = (product: Product) => {
+  const handleProductAction = (product: Product) => {
+    const isImmediate = product.availability_type === "immediate";
+    
     if (!isAuthenticated) {
       setPendingProduct(product);
+      setPendingAction(isImmediate ? "cart" : "reserve");
       setIsAuthModalOpen(true);
     } else {
-      setSelectedProduct(product);
-      setIsModalOpen(true);
+      if (isImmediate) {
+        // Open add to cart modal
+        setCartModalProduct({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          unit: product.unit,
+          image_url: product.image,
+        });
+        setIsCartModalOpen(true);
+      } else {
+        // Open reservation modal
+        setSelectedProduct(product);
+        setIsModalOpen(true);
+      }
     }
   };
 
   const handleAuthSuccess = () => {
     setIsAuthModalOpen(false);
     if (pendingProduct) {
-      setSelectedProduct(pendingProduct);
-      setIsModalOpen(true);
+      if (pendingAction === "cart") {
+        setCartModalProduct({
+          id: pendingProduct.id,
+          name: pendingProduct.name,
+          price: pendingProduct.price,
+          unit: pendingProduct.unit,
+          image_url: pendingProduct.image,
+        });
+        setIsCartModalOpen(true);
+      } else {
+        setSelectedProduct(pendingProduct);
+        setIsModalOpen(true);
+      }
       setPendingProduct(null);
+      setPendingAction(null);
     }
   };
 
   return (
     <div className="min-h-screen bg-background gradient-festive">
-      {/* Header with Sidebar */}
+      {/* Header with Sidebar and Cart */}
       <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-30">
         <div className="container py-4 flex items-center justify-between">
           <CatalogSidebar onOpenAuth={() => setIsAuthModalOpen(true)} />
           <img src={logo} alt="Donna Juce Açougue" className="h-12 w-auto" />
-          <div className="w-10" /> {/* Spacer for centering */}
+          <CartIcon />
         </div>
       </header>
 
@@ -148,7 +185,7 @@ const Catalog = () => {
                         className="animate-fade-in"
                         style={{ animationDelay: `${0.1 * index}s` }}
                       >
-                        <ProductCard product={product} onReserve={handleReserve} />
+                        <ProductCard product={product} onReserve={handleProductAction} />
                       </div>
                     ))}
                   </div>
@@ -176,7 +213,7 @@ const Catalog = () => {
                         className="animate-fade-in"
                         style={{ animationDelay: `${0.1 * index}s` }}
                       >
-                        <ProductCard product={product} onReserve={handleReserve} />
+                        <ProductCard product={product} onReserve={handleProductAction} />
                       </div>
                     ))}
                   </div>
@@ -220,6 +257,7 @@ const Catalog = () => {
         onClose={() => {
           setIsAuthModalOpen(false);
           setPendingProduct(null);
+          setPendingAction(null);
         }}
         onSuccess={handleAuthSuccess}
       />
@@ -232,6 +270,16 @@ const Catalog = () => {
           setIsModalOpen(false);
           setSelectedProduct(null);
         }}
+      />
+
+      {/* Add to Cart Modal */}
+      <AddToCartModal
+        isOpen={isCartModalOpen}
+        onClose={() => {
+          setIsCartModalOpen(false);
+          setCartModalProduct(null);
+        }}
+        product={cartModalProduct}
       />
     </div>
   );
