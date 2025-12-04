@@ -36,25 +36,29 @@ export function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutModalProps
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [savedAddress, setSavedAddress] = useState<string | null>(null);
+  const [customerData, setCustomerData] = useState<{ name: string; phone: string } | null>(null);
 
   useEffect(() => {
     if (isOpen && customer) {
-      fetchCustomerAddress();
+      fetchCustomerData();
     }
   }, [isOpen, customer]);
 
-  const fetchCustomerAddress = async () => {
+  const fetchCustomerData = async () => {
     if (!customer) return;
     
     const { data } = await supabase
       .from("customers")
-      .select("address")
+      .select("name, phone, address")
       .eq("id", customer.id)
       .maybeSingle();
 
-    if (data?.address) {
-      setSavedAddress(data.address);
-      setAddress(data.address);
+    if (data) {
+      setCustomerData({ name: data.name, phone: data.phone });
+      if (data.address) {
+        setSavedAddress(data.address);
+        setAddress(data.address);
+      }
     }
   };
 
@@ -69,8 +73,8 @@ export function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutModalProps
 
   const generateOrderText = () => {
     let text = `🛒 *NOVO PEDIDO*\n\n`;
-    text += `👤 *Cliente:* ${customer?.name}\n`;
-    text += `📱 *Telefone:* ${customer?.phone}\n\n`;
+    text += `👤 *Cliente:* ${customerData?.name || "N/A"}\n`;
+    text += `📱 *Telefone:* ${customerData?.phone || "N/A"}\n\n`;
 
     text += `📦 *Itens do Pedido:*\n`;
     text += `─────────────────\n`;
