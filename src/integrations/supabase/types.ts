@@ -97,6 +97,7 @@ export type Database = {
       }
       products: {
         Row: {
+          availability_type: string
           category: string
           created_at: string
           description: string | null
@@ -112,6 +113,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          availability_type?: string
           category: string
           created_at?: string
           description?: string | null
@@ -127,6 +129,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          availability_type?: string
           category?: string
           created_at?: string
           description?: string | null

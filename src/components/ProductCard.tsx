@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Calendar } from "lucide-react";
 
 export interface Product {
   id: string;
@@ -9,6 +9,9 @@ export interface Product {
   unit: string;
   image: string;
   category: string;
+  availability_type?: "immediate" | "reservation";
+  reservation_type?: string;
+  reservation_date?: string | null;
 }
 
 interface ProductCardProps {
@@ -17,6 +20,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onReserve }: ProductCardProps) {
+  const isImmediate = product.availability_type === "immediate";
+
   return (
     <div className="card-product group">
       <div className="relative aspect-square overflow-hidden">
@@ -47,13 +52,22 @@ export function ProductCard({ product, onReserve }: ProductCardProps) {
             <span className="text-muted-foreground text-sm">/{product.unit}</span>
           </div>
           <Button
-            variant="christmas"
+            variant={isImmediate ? "default" : "christmas"}
             size="sm"
             onClick={() => onReserve(product)}
             className="gap-1"
           >
-            <ShoppingCart className="h-4 w-4" />
-            Reservar
+            {isImmediate ? (
+              <>
+                <ShoppingCart className="h-4 w-4" />
+                Comprar
+              </>
+            ) : (
+              <>
+                <Calendar className="h-4 w-4" />
+                Reservar
+              </>
+            )}
           </Button>
         </div>
       </div>
