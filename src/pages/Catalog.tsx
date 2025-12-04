@@ -9,7 +9,7 @@ import { CatalogSidebar } from "@/components/CatalogSidebar";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { toProductDisplay } from "@/types/product";
-import { Gift, Snowflake } from "lucide-react";
+import { Gift, Snowflake, ShoppingCart, Calendar } from "lucide-react";
 import logo from "@/assets/logo-extended.png";
 
 const Catalog = () => {
@@ -31,9 +31,14 @@ const Catalog = () => {
     ? ["Todos", ...new Set(dbProducts.map(p => p.category))]
     : ["Todos"];
 
+  // Filter by category first
   const filteredProducts = selectedCategory === "Todos"
     ? products
     : products.filter((p) => p.category === selectedCategory);
+
+  // Separate by availability type
+  const immediateProducts = filteredProducts.filter((p) => p.availability_type === "immediate");
+  const reservationProducts = filteredProducts.filter((p) => p.availability_type !== "immediate");
 
   const handleReserve = (product: Product) => {
     if (!isAuthenticated) {
@@ -106,7 +111,7 @@ const Catalog = () => {
         </section>
 
         {/* Products Grid */}
-        <section className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
+        <section className="space-y-10 animate-fade-in" style={{ animationDelay: "0.3s" }}>
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
@@ -121,17 +126,72 @@ const Catalog = () => {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product, index) => (
-                <div
-                  key={product.id}
-                  className="animate-fade-in"
-                  style={{ animationDelay: `${0.1 * index}s` }}
-                >
-                  <ProductCard product={product} onReserve={handleReserve} />
+            <>
+              {/* Disponíveis Agora Section */}
+              {immediateProducts.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <ShoppingCart className="h-5 w-5 text-green-700" />
+                    </div>
+                    <h3 className="font-display text-2xl font-bold text-foreground">
+                      Disponíveis Agora
+                    </h3>
+                  </div>
+                  <p className="text-muted-foreground text-sm">
+                    Produtos prontos para compra imediata
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {immediateProducts.map((product, index) => (
+                      <div
+                        key={product.id}
+                        className="animate-fade-in"
+                        style={{ animationDelay: `${0.1 * index}s` }}
+                      >
+                        <ProductCard product={product} onReserve={handleReserve} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
+              )}
+
+              {/* Para Reserva Section */}
+              {reservationProducts.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Calendar className="h-5 w-5 text-blue-700" />
+                    </div>
+                    <h3 className="font-display text-2xl font-bold text-foreground">
+                      Para Reserva
+                    </h3>
+                  </div>
+                  <p className="text-muted-foreground text-sm">
+                    Reserve agora e retire na data escolhida
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {reservationProducts.map((product, index) => (
+                      <div
+                        key={product.id}
+                        className="animate-fade-in"
+                        style={{ animationDelay: `${0.1 * index}s` }}
+                      >
+                        <ProductCard product={product} onReserve={handleReserve} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {immediateProducts.length === 0 && reservationProducts.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">
+                    Nenhum produto encontrado nesta categoria.
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </section>
 

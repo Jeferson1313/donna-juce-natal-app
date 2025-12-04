@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Image, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, Image, Package, Eye, EyeOff, ShoppingCart, Calendar } from "lucide-react";
 import { Product } from "@/types/product";
 
 const DEFAULT_CATEGORIES = ["Bovinos", "Suínos", "Aves", "Embutidos"];
@@ -33,6 +33,7 @@ export function ProductManagement() {
     is_available: true,
     reservation_type: "any_day",
     reservation_date: "",
+    availability_type: "reservation" as "immediate" | "reservation",
   });
   const [uploading, setUploading] = useState(false);
 
@@ -84,6 +85,7 @@ export function ProductManagement() {
       is_available: product.is_available,
       reservation_type: product.reservation_type,
       reservation_date: product.reservation_date || "",
+      availability_type: (product as any).availability_type || "reservation",
     });
     setIsDialogOpen(true);
   };
@@ -100,8 +102,27 @@ export function ProductManagement() {
       is_available: true,
       reservation_type: "any_day",
       reservation_date: "",
+      availability_type: "reservation",
     });
     setIsDialogOpen(true);
+  };
+
+  const handleQuickToggle = async (product: Product) => {
+    try {
+      await updateProduct.mutateAsync({
+        id: product.id,
+        is_available: !product.is_available,
+      });
+      toast({
+        title: product.is_available ? "Produto desativado" : "Produto ativado",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -129,6 +150,7 @@ export function ProductManagement() {
           is_available: formData.is_available,
           reservation_type: formData.reservation_type,
           reservation_date: formData.reservation_type === "specific_day" ? formData.reservation_date : null,
+          availability_type: formData.availability_type,
         });
         toast({ title: "Produto atualizado!" });
       } else {
@@ -144,6 +166,7 @@ export function ProductManagement() {
           order: maxOrder + 1,
           reservation_type: formData.reservation_type,
           reservation_date: formData.reservation_type === "specific_day" ? formData.reservation_date : null,
+          availability_type: formData.availability_type,
         });
         toast({ title: "Produto criado!" });
       }
@@ -271,17 +294,30 @@ export function ProductManagement() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label>Tipo de Reserva</Label>
+                <Label>Tipo de Disponibilidade *</Label>
                 <select
-                  value={formData.reservation_type}
-                  onChange={(e) => setFormData({ ...formData, reservation_type: e.target.value, reservation_date: "" })}
+                  value={formData.availability_type}
+                  onChange={(e) => setFormData({ ...formData, availability_type: e.target.value as "immediate" | "reservation" })}
                   className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
                 >
-                  <option value="any_day">Qualquer dia</option>
-                  <option value="specific_day">Dia específico</option>
+                  <option value="immediate">Disponível Agora (Comprar)</option>
+                  <option value="reservation">Só para Reserva</option>
                 </select>
               </div>
-              {formData.reservation_type === "specific_day" && (
+              {formData.availability_type === "reservation" && (
+                <div className="space-y-2">
+                  <Label>Tipo de Reserva</Label>
+                  <select
+                    value={formData.reservation_type}
+                    onChange={(e) => setFormData({ ...formData, reservation_type: e.target.value, reservation_date: "" })}
+                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                  >
+                    <option value="any_day">Qualquer dia</option>
+                    <option value="specific_day">Dia específico</option>
+                  </select>
+                </div>
+              )}
+              {formData.availability_type === "reservation" && formData.reservation_type === "specific_day" && (
                 <div className="space-y-2">
                   <Label htmlFor="reservation_date">Data da Reserva *</Label>
                   <Input
@@ -316,62 +352,91 @@ export function ProductManagement() {
             </CardContent>
           </Card>
         )}
-        {products?.map((product) => (
-          <Card key={product.id} className={!product.is_available ? "opacity-50" : ""}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                  {product.image_url ? (
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Image className="h-8 w-8 text-muted-foreground" />
+        {products?.map((product) => {
+          const availabilityType = (product as any).availability_type || "reservation";
+          return (
+            <Card key={product.id} className={!product.is_available ? "opacity-50" : ""}>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                    {product.image_url ? (
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Image className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-semibold text-foreground truncate">
+                        {product.name}
+                      </h3>
+                      <span className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded">
+                        {product.category}
+                      </span>
+                      <span className={`text-xs px-2 py-0.5 rounded flex items-center gap-1 ${
+                        availabilityType === "immediate" 
+                          ? "bg-green-100 text-green-700" 
+                          : "bg-blue-100 text-blue-700"
+                      }`}>
+                        {availabilityType === "immediate" ? (
+                          <>
+                            <ShoppingCart className="h-3 w-3" />
+                            Comprar Agora
+                          </>
+                        ) : (
+                          <>
+                            <Calendar className="h-3 w-3" />
+                            Reserva
+                          </>
+                        )}
+                      </span>
                     </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
+                    <p className="text-sm text-muted-foreground truncate">
+                      {product.description || "Sem descrição"}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="font-bold text-primary">
+                        R$ {Number(product.price).toFixed(2)}
+                      </span>
+                      <span className="text-xs text-muted-foreground">/{product.unit}</span>
+                    </div>
+                  </div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-foreground truncate">
-                      {product.name}
-                    </h3>
-                    <span className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded">
-                      {product.category}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {product.description || "Sem descrição"}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="font-bold text-primary">
-                      R$ {Number(product.price).toFixed(2)}
-                    </span>
-                    <span className="text-xs text-muted-foreground">/{product.unit}</span>
-                    <span className={`text-xs ml-2 ${product.is_available ? "text-green-600" : "text-muted-foreground"}`}>
-                      {product.is_available ? "Disponível" : "Indisponível"}
-                    </span>
+                    <Button
+                      variant={product.is_available ? "default" : "outline"}
+                      size="icon"
+                      onClick={() => handleQuickToggle(product)}
+                      title={product.is_available ? "Desativar produto" : "Ativar produto"}
+                    >
+                      {product.is_available ? (
+                        <Eye className="h-4 w-4" />
+                      ) : (
+                        <EyeOff className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button variant="outline" size="icon" onClick={() => openEditDialog(product)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleDelete(product.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="icon" onClick={() => openEditDialog(product)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleDelete(product.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </section>
   );
