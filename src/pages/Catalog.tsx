@@ -71,7 +71,10 @@ const Catalog = () => {
               <span className="text-sm text-muted-foreground hidden sm:block">
                 Olá, {customer.name.split(" ")[0]}
               </span>
-              <Button variant="outline" size="sm" onClick={signOut}>
+              <Button variant="outline" size="sm" onClick={() => navigate("/minhas-reservas")}>
+                Meus Pedidos
+              </Button>
+              <Button variant="ghost" size="sm" onClick={signOut}>
                 Sair
               </Button>
             </div>

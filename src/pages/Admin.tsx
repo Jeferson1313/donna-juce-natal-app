@@ -11,10 +11,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, LogOut, Image, ArrowLeft, Images, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, LogOut, Image, ArrowLeft, Images, Package, ClipboardList } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { CarouselSlide } from "@/types/carousel";
 import { ProductManagement } from "@/components/admin/ProductManagement";
+import { ReservationManagement } from "@/components/admin/ReservationManagement";
 
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -199,7 +200,7 @@ export default function Admin() {
 
       <main className="container py-8">
         <Tabs defaultValue="carousel" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-lg grid-cols-3">
             <TabsTrigger value="carousel" className="flex items-center gap-2">
               <Images className="h-4 w-4" />
               Carrossel
@@ -207,6 +208,10 @@ export default function Admin() {
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Produtos
+            </TabsTrigger>
+            <TabsTrigger value="reservations" className="flex items-center gap-2">
+              <ClipboardList className="h-4 w-4" />
+              Reservas
             </TabsTrigger>
           </TabsList>
 
@@ -353,6 +358,10 @@ export default function Admin() {
 
           <TabsContent value="products">
             <ProductManagement />
+          </TabsContent>
+
+          <TabsContent value="reservations">
+            <ReservationManagement />
           </TabsContent>
         </Tabs>
       </main>
