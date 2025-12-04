@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "@/components/Header";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductCard, Product } from "@/components/ProductCard";
 import { ReservationModal } from "@/components/ReservationModal";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CustomerAuthModal } from "@/components/CustomerAuthModal";
+import { CatalogSidebar } from "@/components/CatalogSidebar";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { toProductDisplay } from "@/types/product";
-import { Gift, Snowflake, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Gift, Snowflake } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const Catalog = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const Catalog = () => {
   const [pendingProduct, setPendingProduct] = useState<Product | null>(null);
 
   const { data: dbProducts, isLoading } = useProducts();
-  const { isAuthenticated, customer, signOut } = useCustomerAuth();
+  const { isAuthenticated } = useCustomerAuth();
 
   // Use only database products
   const products = dbProducts ? dbProducts.map(toProductDisplay) : [];
@@ -56,33 +56,17 @@ const Catalog = () => {
 
   return (
     <div className="min-h-screen bg-background gradient-festive">
-      {/* Simple Header */}
+      {/* Header with Sidebar */}
       <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-30">
         <div className="container py-4 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
-          </Button>
-          <h1 className="font-display text-lg font-semibold text-foreground">
-            DONNA JUCE AÇOUGUE
-          </h1>
-          {isAuthenticated && customer ? (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground hidden sm:block">
-                Olá, {customer.name.split(" ")[0]}
-              </span>
-              <Button variant="outline" size="sm" onClick={() => navigate("/minhas-reservas")}>
-                Meus Pedidos
-              </Button>
-              <Button variant="ghost" size="sm" onClick={signOut}>
-                Sair
-              </Button>
-            </div>
-          ) : (
-            <Button variant="outline" size="sm" onClick={() => setIsAuthModalOpen(true)}>
-              Entrar
-            </Button>
-          )}
+          <CatalogSidebar onOpenAuth={() => setIsAuthModalOpen(true)} />
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="Donna Juce Açougue" className="h-10 w-auto" />
+            <h1 className="font-display text-lg font-semibold text-foreground hidden sm:block">
+              DONNA JUCE AÇOUGUE
+            </h1>
+          </div>
+          <div className="w-10" /> {/* Spacer for centering */}
         </div>
       </header>
 

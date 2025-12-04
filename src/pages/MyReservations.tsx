@@ -1,12 +1,16 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { useCustomerReservations } from "@/hooks/useReservations";
+import { CatalogSidebar } from "@/components/CatalogSidebar";
+import { CustomerAuthModal } from "@/components/CustomerAuthModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Package, Calendar, Clock, ShoppingBag } from "lucide-react";
+import { Package, Calendar, Clock, ShoppingBag } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import logo from "@/assets/logo.png";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { label: "Pendente", variant: "secondary" },
@@ -18,8 +22,9 @@ const statusConfig: Record<string, { label: string; variant: "default" | "second
 
 export default function MyReservations() {
   const navigate = useNavigate();
-  const { customer, isAuthenticated, loading: authLoading, signOut } = useCustomerAuth();
+  const { customer, isAuthenticated, loading: authLoading } = useCustomerAuth();
   const { data: reservations, isLoading } = useCustomerReservations(customer?.id);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   if (authLoading) {
     return (
@@ -43,26 +48,26 @@ export default function MyReservations() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Header with Sidebar */}
       <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-30">
         <div className="container py-4 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/catalogo")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Catálogo
-          </Button>
-          <h1 className="font-display text-lg font-semibold text-foreground">
-            Minhas Reservas
-          </h1>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground hidden sm:block">
-              {customer?.name.split(" ")[0]}
-            </span>
-            <Button variant="outline" size="sm" onClick={signOut}>
-              Sair
-            </Button>
+          <CatalogSidebar onOpenAuth={() => setIsAuthModalOpen(true)} />
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="Donna Juce Açougue" className="h-10 w-auto" />
+            <h1 className="font-display text-lg font-semibold text-foreground hidden sm:block">
+              Minhas Reservas
+            </h1>
           </div>
+          <div className="w-10" /> {/* Spacer for centering */}
         </div>
       </header>
+
+      {/* Auth Modal */}
+      <CustomerAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => setIsAuthModalOpen(false)}
+      />
 
       <main className="container py-6">
         {isLoading ? (
