@@ -173,7 +173,7 @@ const Catalog = () => {
       </main>
 
       {/* WhatsApp Button */}
-      <WhatsAppButton phoneNumber="5500000000000" />
+      <WhatsAppButton phoneNumber="5575982794712" />
 
       {/* Customer Auth Modal */}
       <CustomerAuthModal
