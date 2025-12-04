@@ -29,9 +29,9 @@ export function CatalogSidebar({ onOpenAuth }: CatalogSidebarProps) {
       <SheetContent side="left" className="w-72 p-0">
         <SheetHeader className="p-6 pb-4">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Logo" className="h-12 w-auto" />
-            <SheetTitle className="font-display text-lg">
-              DONNA JUCE
+            <img src={logo} alt="Logo" className="h-12 w-auto shrink-0" />
+            <SheetTitle className="font-display text-base leading-tight text-left">
+              DONNA JUCE AÇOUGUE
             </SheetTitle>
           </div>
         </SheetHeader>
