@@ -10,7 +10,7 @@ import { AddToCartModal } from "@/components/AddToCartModal";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { toProductDisplay } from "@/types/product";
-import { Gift, Snowflake, ShoppingCart, Calendar } from "lucide-react";
+import { ShoppingCart, Calendar } from "lucide-react";
 import logo from "@/assets/logo-extended.png";
 
 const Catalog = () => {
@@ -113,20 +113,6 @@ const Catalog = () => {
           <HeroCarousel />
         </section>
 
-        {/* Welcome Section */}
-        <section className="text-center space-y-4 py-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-          <div className="flex items-center justify-center gap-2 text-secondary">
-            <Snowflake className="h-5 w-5 animate-float" />
-            <Gift className="h-6 w-6" />
-            <Snowflake className="h-5 w-5 animate-float" style={{ animationDelay: "0.5s" }} />
-          </div>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-            Reserve Seu Pedido de Natal
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Garanta as melhores carnes para sua ceia. Faça sua reserva agora e retire no dia escolhido!
-          </p>
-        </section>
 
         {/* Category Filter */}
         <section className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
@@ -249,7 +235,7 @@ const Catalog = () => {
       </main>
 
       {/* WhatsApp Button */}
-      <WhatsAppButton phoneNumber="5575982794712" />
+      <WhatsAppButton phoneNumber="5575983192638" />
 
       {/* Customer Auth Modal */}
       <CustomerAuthModal
