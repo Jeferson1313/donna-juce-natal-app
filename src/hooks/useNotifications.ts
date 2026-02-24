@@ -21,12 +21,6 @@ export function useNotifications(customerId?: string) {
         },
         (payload) => {
           queryClient.invalidateQueries({ queryKey: ["notifications", customerId] });
-          if (Notification.permission === "granted") {
-            new Notification(payload.new.title, {
-              body: payload.new.body,
-              icon: "/favicon.ico"
-            });
-          }
         }
       )
       .subscribe();
@@ -104,6 +98,7 @@ export function useCreateNotification() {
       body: string;
       link?: string;
     }) => {
+      // Insert notification in DB
       const { error } = await supabase
         .from("notifications")
         .insert({
@@ -114,23 +109,94 @@ export function useCreateNotification() {
         });
 
       if (error) throw error;
+
+      // Send push notification via edge function
+      try {
+        await supabase.functions.invoke("send-push", {
+          body: { customer_id: customerId, title, body, link },
+        });
+      } catch (e) {
+        console.warn("Push notification failed (non-blocking):", e);
+      }
     },
   });
 }
 
-export async function requestNotificationPermission() {
-  if (!("Notification" in window)) {
+/**
+ * Register service worker and subscribe to Web Push.
+ * Call after login/signup when customerId is known.
+ */
+export async function subscribeToPush(customerId: string) {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    console.warn("Push not supported");
     return false;
   }
 
-  if (Notification.permission === "granted") {
-    return true;
-  }
+  try {
+    const registration = await navigator.serviceWorker.register("/sw.js");
+    await navigator.serviceWorker.ready;
 
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return false;
+
+    const vapidPublicKey = import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY;
+    if (!vapidPublicKey) {
+      console.warn("VAPID public key not configured");
+      return false;
+    }
+
+    const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
+
+    let subscription = await (registration as any).pushManager.getSubscription();
+    
+    if (!subscription) {
+      subscription = await (registration as any).pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey,
+      });
+    }
+
+    const subJson = subscription.toJSON();
+    
+    // Save to DB (upsert by endpoint)
+    const { error } = await supabase
+      .from("push_subscriptions")
+      .upsert(
+        {
+          customer_id: customerId,
+          endpoint: subJson.endpoint!,
+          p256dh: subJson.keys!.p256dh!,
+          auth: subJson.keys!.auth!,
+        },
+        { onConflict: "endpoint" }
+      );
+
+    if (error) {
+      console.error("Failed to save push subscription:", error);
+      return false;
+    }
+
+    console.log("Push subscription saved successfully");
+    return true;
+  } catch (err) {
+    console.error("Push subscription failed:", err);
+    return false;
+  }
+}
+
+export async function requestNotificationPermission() {
+  if (!("Notification" in window)) return false;
+  if (Notification.permission === "granted") return true;
   if (Notification.permission !== "denied") {
     const permission = await Notification.requestPermission();
     return permission === "granted";
   }
-
   return false;
+}
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return new Uint8Array([...rawData].map((char) => char.charCodeAt(0)));
 }
