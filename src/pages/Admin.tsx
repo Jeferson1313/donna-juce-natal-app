@@ -11,11 +11,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, LogOut, Image, ArrowLeft, Images, Package, ClipboardList } from "lucide-react";
+import { Plus, Pencil, Trash2, LogOut, Image, ArrowLeft, Images, Package, ClipboardList, ShoppingBag, Bell } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { CarouselSlide } from "@/types/carousel";
 import { ProductManagement } from "@/components/admin/ProductManagement";
 import { ReservationManagement } from "@/components/admin/ReservationManagement";
+import { OrderManagement } from "@/components/admin/OrderManagement";
+import { NotificationManager } from "@/components/admin/NotificationManager";
 
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -200,18 +202,26 @@ export default function Admin() {
 
       <main className="container py-8">
         <Tabs defaultValue="carousel" className="space-y-6">
-          <TabsList className="grid w-full max-w-lg grid-cols-3">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="carousel" className="flex items-center gap-2">
               <Images className="h-4 w-4" />
-              Carrossel
+              <span className="hidden md:inline">Carrossel</span>
             </TabsTrigger>
             <TabsTrigger value="products" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
-              Produtos
+              <span className="hidden md:inline">Produtos</span>
             </TabsTrigger>
             <TabsTrigger value="reservations" className="flex items-center gap-2">
               <ClipboardList className="h-4 w-4" />
-              Reservas
+              <span className="hidden md:inline">Reservas</span>
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="flex items-center gap-2">
+              <ShoppingBag className="h-4 w-4" />
+              <span className="hidden md:inline">Pedidos</span>
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              <span className="hidden md:inline">Notificações</span>
             </TabsTrigger>
           </TabsList>
 
@@ -362,6 +372,14 @@ export default function Admin() {
 
           <TabsContent value="reservations">
             <ReservationManagement />
+          </TabsContent>
+
+          <TabsContent value="orders">
+            <OrderManagement />
+          </TabsContent>
+
+          <TabsContent value="notifications">
+            <NotificationManager />
           </TabsContent>
         </Tabs>
       </main>
