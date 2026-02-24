@@ -23,7 +23,7 @@ interface CheckoutModalProps {
   onSuccess: () => void;
 }
 
-const WHATSAPP_NUMBER = "5575982794712";
+const WHATSAPP_NUMBER = "5575983192638";
 
 export function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutModalProps) {
   const { items, totalPrice, clearCart } = useCart();
@@ -72,11 +72,11 @@ export function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutModalProps
   };
 
   const generateOrderText = () => {
-    let text = `🛒 *NOVO PEDIDO*\n\n`;
-    text += `👤 *Cliente:* ${customerData?.name || "N/A"}\n`;
-    text += `📱 *Telefone:* ${customerData?.phone || "N/A"}\n\n`;
+    let text = `*NOVO PEDIDO*\n\n`;
+    text += `*Cliente:* ${customerData?.name || "N/A"}\n`;
+    text += `*Telefone:* ${customerData?.phone || "N/A"}\n\n`;
 
-    text += `📦 *Itens do Pedido:*\n`;
+    text += `*Itens do Pedido:*\n`;
     text += `─────────────────\n`;
 
     items.forEach((item) => {
@@ -88,18 +88,18 @@ export function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutModalProps
     });
 
     text += `─────────────────\n`;
-    text += `💰 *Total: R$ ${totalPrice.toFixed(2)}*\n\n`;
+    text += `*Total: R$ ${totalPrice.toFixed(2)}*\n\n`;
 
-    text += `💳 *Forma de Pagamento:* ${getPaymentLabel(paymentMethod)}\n`;
+    text += `*Forma de Pagamento:* ${getPaymentLabel(paymentMethod)}\n`;
     
     if (deliveryType === "delivery") {
-      text += `🚚 *Entrega no endereço:*\n${address}\n`;
+      text += `*Entrega no endereço:*\n${address}\n`;
     } else {
-      text += `🏪 *Retirada no local*\n`;
+      text += `*Retirada no local*\n`;
     }
 
     if (notes) {
-      text += `\n📝 *Observações:* ${notes}\n`;
+      text += `\n*Observações:* ${notes}\n`;
     }
 
     return text;
