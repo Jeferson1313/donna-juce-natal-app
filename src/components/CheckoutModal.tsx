@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCart } from "@/contexts/CartContext";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
+import { useCreateOrder } from "@/hooks/useOrders";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { MessageCircle, Loader2 } from "lucide-react";
@@ -28,6 +29,7 @@ const WHATSAPP_NUMBER = "5575983192638";
 export function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutModalProps) {
   const { items, totalPrice, clearCart } = useCart();
   const { customer } = useCustomerAuth();
+  const createOrder = useCreateOrder();
   const { toast } = useToast();
 
   const [deliveryType, setDeliveryType] = useState<"delivery" | "pickup">("delivery");
@@ -132,16 +134,35 @@ export function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutModalProps
         await saveAddress(address);
       }
 
+      // Save order to database
+      if (customer) {
+        await createOrder.mutateAsync({
+          customerId: customer.id,
+          deliveryType,
+          address: deliveryType === "delivery" ? address : undefined,
+          paymentMethod,
+          notes: notes || undefined,
+          total: totalPrice,
+          items: items.map((item) => ({
+            productId: item.productId,
+            productName: item.name,
+            quantity: item.quantity,
+            unit: item.unit,
+            price: item.price,
+            notes: item.notes,
+          })),
+        });
+      }
+
       const orderText = generateOrderText();
       const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderText)}`;
-
       window.open(whatsappUrl, "_blank");
 
       clearCart();
       
       toast({
         title: "Pedido enviado!",
-        description: "Você será redirecionado para o WhatsApp.",
+        description: "Seu pedido foi registrado e enviado via WhatsApp.",
       });
 
       onSuccess();
