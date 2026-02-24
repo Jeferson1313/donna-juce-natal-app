@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
+import { requestNotificationPermission } from "@/hooks/useNotifications";
 import { User, Phone } from "lucide-react";
 
 interface CustomerAuthModalProps {
@@ -59,6 +60,7 @@ export function CustomerAuthModal({ isOpen, onClose, onSuccess }: CustomerAuthMo
           title: "Cadastro realizado!",
           description: "Agora você pode fazer suas reservas.",
         });
+        requestNotificationPermission();
         onSuccess();
       }
     } else {
@@ -74,6 +76,7 @@ export function CustomerAuthModal({ isOpen, onClose, onSuccess }: CustomerAuthMo
         toast({
           title: "Bem-vindo de volta!",
         });
+        requestNotificationPermission();
         onSuccess();
       }
     }
