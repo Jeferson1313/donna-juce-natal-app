@@ -10,7 +10,14 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const publicKey = Deno.env.get("WEB_PUSH_PUBLIC_KEY") || "";
+  const publicKey = (Deno.env.get("WEB_PUSH_PUBLIC_KEY") || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/^"|"$/g, "")
+    .replace(/^'|'$/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
 
   return new Response(JSON.stringify({ publicKey }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },

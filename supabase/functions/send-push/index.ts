@@ -7,6 +7,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
+function normalizeVapidKey(value: string | undefined) {
+  return (value || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/^"|"$/g, "")
+    .replace(/^'|'$/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -17,8 +28,15 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const publicKey = Deno.env.get("WEB_PUSH_PUBLIC_KEY")!;
-    const privateKey = Deno.env.get("WEB_PUSH_PRIVATE_KEY")!;
+    const publicKey = normalizeVapidKey(Deno.env.get("WEB_PUSH_PUBLIC_KEY"));
+    const privateKey = normalizeVapidKey(Deno.env.get("WEB_PUSH_PRIVATE_KEY"));
+
+    if (!publicKey || !privateKey) {
+      return new Response(JSON.stringify({ error: "Missing WEB_PUSH_PUBLIC_KEY or WEB_PUSH_PRIVATE_KEY" }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     webpush.setVapidDetails("mailto:push@lovable.app", publicKey, privateKey);
 
