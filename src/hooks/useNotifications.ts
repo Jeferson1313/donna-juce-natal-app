@@ -139,9 +139,11 @@ export async function subscribeToPush(customerId: string) {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") return false;
 
-    const vapidPublicKey = import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY;
+    // Fetch VAPID public key from edge function
+    const { data: vapidData } = await supabase.functions.invoke("get-vapid-key");
+    const vapidPublicKey = vapidData?.publicKey;
     if (!vapidPublicKey) {
-      console.warn("VAPID public key not configured");
+      console.warn("VAPID public key not available");
       return false;
     }
 
