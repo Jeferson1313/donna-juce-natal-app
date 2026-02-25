@@ -123,6 +123,25 @@ export function useCreateNotification() {
 }
 
 /**
+ * Register the app Service Worker as early as possible.
+ */
+export async function registerAppServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    return null;
+  }
+
+  try {
+    const existing = await navigator.serviceWorker.getRegistration("/service-worker.js");
+    if (existing) return existing;
+
+    return await navigator.serviceWorker.register("/service-worker.js");
+  } catch (err) {
+    console.warn("Service Worker registration failed:", err);
+    return null;
+  }
+}
+
+/**
  * Register service worker and subscribe to Web Push.
  * Call after login/signup when customerId is known.
  */
@@ -133,13 +152,15 @@ export async function subscribeToPush(customerId: string) {
   }
 
   try {
-    const registration = await navigator.serviceWorker.register("/sw.js");
+    const registration = await registerAppServiceWorker();
+    if (!registration) return false;
+
     await navigator.serviceWorker.ready;
 
     const permission = await Notification.requestPermission();
     if (permission !== "granted") return false;
 
-    // Fetch VAPID public key from edge function
+    // Fetch VAPID public key from backend function
     const { data: vapidData } = await supabase.functions.invoke("get-vapid-key");
     const vapidPublicKey = vapidData?.publicKey;
     if (!vapidPublicKey) {
@@ -149,17 +170,21 @@ export async function subscribeToPush(customerId: string) {
 
     const applicationServerKey = urlBase64ToUint8Array(vapidPublicKey);
 
-    let subscription = await (registration as any).pushManager.getSubscription();
-    
+    const pushManager = (registration as ServiceWorkerRegistration & {
+      pushManager: PushManager;
+    }).pushManager;
+
+    let subscription = await pushManager.getSubscription();
+
     if (!subscription) {
-      subscription = await (registration as any).pushManager.subscribe({
+      subscription = await pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey,
+        applicationServerKey: applicationServerKey as unknown as BufferSource,
       });
     }
 
     const subJson = subscription.toJSON();
-    
+
     // Save to DB (upsert by endpoint)
     const { error } = await supabase
       .from("push_subscriptions")
@@ -197,8 +222,14 @@ export async function requestNotificationPermission() {
 }
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = atob(base64);
-  return new Uint8Array([...rawData].map((char) => char.charCodeAt(0)));
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; i++) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+
+  return outputArray;
 }
