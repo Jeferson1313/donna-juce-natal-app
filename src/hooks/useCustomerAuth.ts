@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { requestNotificationPermission } from "@/hooks/useNotifications";
+import { subscribeToPush } from "@/hooks/useNotifications";
 
 export interface Customer {
   id: string;
@@ -55,8 +55,8 @@ export function useCustomerAuth() {
 
     if (!error && data) {
       setCustomer(data);
-      // Request notification permission when customer is identified
-      requestNotificationPermission();
+      // Subscribe to push notifications when customer is identified
+      subscribeToPush(data.id);
     }
     setLoading(false);
   };

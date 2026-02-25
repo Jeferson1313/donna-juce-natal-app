@@ -83,6 +83,15 @@ export function useUpdateOrderStatus() {
             body,
             link: "/meus-pedidos"
           });
+
+          // Send push notification
+          try {
+            await supabase.functions.invoke("send-push", {
+              body: { customer_id: order.customer_id, title, body, link: "/meus-pedidos" },
+            });
+          } catch (e) {
+            console.warn("Push failed (non-blocking):", e);
+          }
         }
       }
     },
