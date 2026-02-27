@@ -94,7 +94,6 @@ export function HeroCarousel() {
           ))}
         </div>
       )}
-
       {/* Overlay Content */}
       <div className="absolute bottom-8 left-8 right-8 text-center md:text-left">
         <h2 className="font-display text-2xl md:text-4xl lg:text-5xl font-bold text-card drop-shadow-lg">
