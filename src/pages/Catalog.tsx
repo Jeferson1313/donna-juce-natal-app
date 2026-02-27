@@ -7,6 +7,7 @@ import { CustomerAuthModal } from "@/components/CustomerAuthModal";
 import { CatalogSidebar } from "@/components/CatalogSidebar";
 import { CartIcon } from "@/components/CartIcon";
 import { AddToCartModal } from "@/components/AddToCartModal";
+import { PromotionSection } from "@/components/PromotionSection";
 import { useProducts } from "@/hooks/useProducts";
 import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { toProductDisplay } from "@/types/product";
@@ -113,6 +114,35 @@ const Catalog = () => {
           <HeroCarousel />
         </section>
 
+
+        {/* Promotions Section */}
+        <PromotionSection
+          onProductAction={(product) => {
+            if (!isAuthenticated) {
+              setPendingProduct({
+                id: product.id,
+                name: product.name,
+                description: "",
+                price: product.price,
+                unit: product.unit,
+                image: product.image_url || "/placeholder.svg",
+                category: "",
+                availability_type: "immediate",
+              });
+              setPendingAction("cart");
+              setIsAuthModalOpen(true);
+            } else {
+              setCartModalProduct({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                unit: product.unit,
+                image_url: product.image_url,
+              });
+              setIsCartModalOpen(true);
+            }
+          }}
+        />
 
         {/* Category Filter */}
         <section className="animate-fade-in" style={{ animationDelay: "0.2s" }}>

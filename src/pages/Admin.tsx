@@ -11,13 +11,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, LogOut, Image, ArrowLeft, Images, Package, ClipboardList, ShoppingBag, Bell } from "lucide-react";
+import { Plus, Pencil, Trash2, LogOut, Image, ArrowLeft, Images, Package, ClipboardList, ShoppingBag, Bell, Percent } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { CarouselSlide } from "@/types/carousel";
 import { ProductManagement } from "@/components/admin/ProductManagement";
 import { ReservationManagement } from "@/components/admin/ReservationManagement";
 import { OrderManagement } from "@/components/admin/OrderManagement";
 import { NotificationManager } from "@/components/admin/NotificationManager";
+import { PromotionManagement } from "@/components/admin/PromotionManagement";
 
 export default function Admin() {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -202,7 +203,7 @@ export default function Admin() {
 
       <main className="container py-8">
         <Tabs defaultValue="carousel" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="carousel" className="flex items-center gap-2">
               <Images className="h-4 w-4" />
               <span className="hidden md:inline">Carrossel</span>
@@ -222,6 +223,10 @@ export default function Admin() {
             <TabsTrigger value="notifications" className="flex items-center gap-2">
               <Bell className="h-4 w-4" />
               <span className="hidden md:inline">Notificações</span>
+            </TabsTrigger>
+            <TabsTrigger value="promotions" className="flex items-center gap-2">
+              <Percent className="h-4 w-4" />
+              <span className="hidden md:inline">Promoções</span>
             </TabsTrigger>
           </TabsList>
 
@@ -380,6 +385,10 @@ export default function Admin() {
 
           <TabsContent value="notifications">
             <NotificationManager />
+          </TabsContent>
+
+          <TabsContent value="promotions">
+            <PromotionManagement />
           </TabsContent>
         </Tabs>
       </main>

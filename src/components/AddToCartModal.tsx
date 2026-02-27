@@ -64,8 +64,12 @@ export function AddToCartModal({ isOpen, onClose, product }: AddToCartModalProps
     }
   };
 
-  const incrementQuantity = () => setQuantity((q) => q + 1);
-  const decrementQuantity = () => setQuantity((q) => Math.max(0.5, q - 1));
+  const isKg = product?.unit === "kg";
+  const step = isKg ? 0.1 : 1;
+  const minQty = isKg ? 0.1 : 1;
+  
+  const incrementQuantity = () => setQuantity((q) => parseFloat((q + step).toFixed(2)));
+  const decrementQuantity = () => setQuantity((q) => Math.max(minQty, parseFloat((q - step).toFixed(2))));
 
   if (!product) return null;
 
@@ -95,8 +99,8 @@ export function AddToCartModal({ isOpen, onClose, product }: AddToCartModalProps
               <Input
                 id="quantity"
                 type="number"
-                step="0.5"
-                min="0.5"
+                step={isKg ? "0.1" : "1"}
+                min={isKg ? "0.1" : "1"}
                 value={quantity}
                 onChange={(e) => handleQuantityChange(e.target.value)}
                 className="w-24 text-center"
