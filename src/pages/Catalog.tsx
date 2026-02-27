@@ -108,12 +108,15 @@ const Catalog = () => {
         </div>
       </header>
 
-      {/* Hero Full Width */}
-      <section className="w-full animate-fade-in">
+      <>
+        {/* HERO FORA DO CONTAINER */}
         <HeroCarousel />
-      </section>
       
-      <main className="container py-6 space-y-8">
+        {/* CONTEÚDO DENTRO DO CONTAINER */}
+        <div className="container mx-auto px-4">
+          <ProductList />
+        </div>
+      </>
 
 
         {/* Promotions Section */}
