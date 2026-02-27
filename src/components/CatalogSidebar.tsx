@@ -3,7 +3,7 @@ import { useCustomerAuth } from "@/hooks/useCustomerAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { Menu, Home, ShoppingBag, LogIn, LogOut, User } from "lucide-react";
+import { Menu, Home, ShoppingBag, ClipboardList, LogIn, LogOut, User } from "lucide-react";
 import logo from "@/assets/logo-extended.png";
 
 interface CatalogSidebarProps {
@@ -66,10 +66,19 @@ export function CatalogSidebar({ onOpenAuth }: CatalogSidebarProps) {
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate("/minhas-reservas")}
+                onClick={() => navigate("/meus-pedidos")}
               >
                 <ShoppingBag className="h-5 w-5" />
                 Meus Pedidos
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 h-12"
+                onClick={() => navigate("/minhas-reservas")}
+              >
+                <ClipboardList className="h-5 w-5" />
+                Minhas Reservas
               </Button>
 
               <Separator className="my-2" />

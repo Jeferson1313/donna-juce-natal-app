@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import Admin from "./pages/Admin";
 import MyReservations from "./pages/MyReservations";
+import MyOrders from "./pages/MyOrders";
 import { registerAppServiceWorker } from "./hooks/useNotifications";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Catalog />} />
               <Route path="/minhas-reservas" element={<MyReservations />} />
+              <Route path="/meus-pedidos" element={<MyOrders />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

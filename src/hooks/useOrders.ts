@@ -162,6 +162,25 @@ export function useCreateOrder() {
 
       if (itemsError) throw itemsError;
 
+      // Notify admin about new order
+      try {
+        const { data: customerData } = await supabase
+          .from("customers")
+          .select("name")
+          .eq("id", customerId)
+          .single();
+
+        await supabase.functions.invoke("send-push", {
+          body: {
+            title: "🛒 Novo Pedido!",
+            body: `${customerData?.name || "Cliente"} fez um pedido de R$ ${total.toFixed(2)}`,
+            link: "/admin",
+          },
+        });
+      } catch (e) {
+        console.warn("Admin notification failed (non-blocking):", e);
+      }
+
       return order;
     },
     onSuccess: () => {

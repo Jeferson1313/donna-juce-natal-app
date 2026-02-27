@@ -72,22 +72,26 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                             variant="outline"
                             size="icon"
                             className="h-7 w-7"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity - 1)
-                            }
+                            onClick={() => {
+                              const step = item.unit === "kg" ? 0.1 : 1;
+                              const min = item.unit === "kg" ? 0.1 : 1;
+                              const newQty = parseFloat((item.quantity - step).toFixed(2));
+                              updateQuantity(item.id, Math.max(min, newQty));
+                            }}
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
-                          <span className="w-12 text-center text-sm">
-                            {item.quantity} {item.unit}
+                          <span className="w-16 text-center text-sm">
+                            {item.unit === "kg" ? item.quantity.toFixed(1) : item.quantity} {item.unit}
                           </span>
                           <Button
                             variant="outline"
                             size="icon"
                             className="h-7 w-7"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
+                            onClick={() => {
+                              const step = item.unit === "kg" ? 0.1 : 1;
+                              updateQuantity(item.id, parseFloat((item.quantity + step).toFixed(2)));
+                            }}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
