@@ -39,68 +39,71 @@ export function HeroCarousel() {
   }
 
   return (
-  <div className="relative w-screen left-1/2 -translate-x-1/2 h-[65vh] md:h-[75vh] overflow-hidden">
-    {slides.map((slide, index) => (
-      <div
-        key={slide.id}
-        className={`absolute inset-0 transition-opacity duration-700 ${
-          index === currentIndex ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        <img
-          src={slide.image_url}
-          alt={slide.title}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-      </div>
-    ))}
-
-    {slides.length > 1 && (
-      <>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute left-6 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full"
-          onClick={goToPrevious}
+    <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden rounded-2xl shadow-elevated">
+      {slides.map((slide, index) => (
+        <div
+          key={slide.id}
+          className={`absolute inset-0 transition-opacity duration-700 ${
+            index === currentIndex ? "opacity-100" : "opacity-0"
+          }`}
         >
-          <ChevronLeft className="h-6 w-6" />
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-6 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full"
-          onClick={goToNext}
-        >
-          <ChevronRight className="h-6 w-6" />
-        </Button>
-      </>
-    )}
-
-    {slides.length > 1 && (
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            className={`h-2 transition-all duration-300 ${
-              index === currentIndex
-                ? "bg-white w-10"
-                : "bg-white/50 hover:bg-white w-3"
-            }`}
-            onClick={() => setCurrentIndex(index)}
+          <img
+            src={slide.image_url}
+            alt={slide.title}
+            className="w-full h-full object-cover"
           />
-        ))}
-      </div>
-    )}
+          <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
+        </div>
+      ))}
 
-    <div className="absolute bottom-12 left-6 md:left-16 text-left">
-      <h2 className="font-display text-3xl md:text-5xl font-bold text-white drop-shadow-xl">
-        {slides[currentIndex]?.title}
-      </h2>
-      <p className="text-white/90 mt-3 text-base md:text-lg max-w-xl drop-shadow">
-        {slides[currentIndex]?.subtitle}
-      </p>
+      {/* Navigation Arrows */}
+      {slides.length > 1 && (
+        <>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-card/80 hover:bg-card text-foreground rounded-full"
+            onClick={goToPrevious}
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-card/80 hover:bg-card text-foreground rounded-full"
+            onClick={goToNext}
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
+        </>
+      )}
+
+      {/* Dots Indicator */}
+      {slides.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                index === currentIndex
+                  ? "bg-accent w-6"
+                  : "bg-card/60 hover:bg-card"
+              }`}
+              onClick={() => setCurrentIndex(index)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Overlay Content */}
+      <div className="absolute bottom-8 left-8 right-8 text-center md:text-left">
+        <h2 className="font-display text-2xl md:text-4xl lg:text-5xl font-bold text-card drop-shadow-lg">
+          {slides[currentIndex]?.title || "Donna Juce Açougue"}
+        </h2>
+        <p className="text-card/90 mt-2 text-sm md:text-base max-w-xl drop-shadow">
+          {slides[currentIndex]?.subtitle || "As melhores carnes para sua mesa"}
+        </p>
+      </div>
     </div>
-  </div>
-);
+  );
+}
