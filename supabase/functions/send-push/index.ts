@@ -42,12 +42,21 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Get push subscriptions
-    let query = supabase.from("push_subscriptions").select("*");
-    if (customer_id) {
-      query = query.eq("customer_id", customer_id);
+    // 🔒 Nunca permitir broadcast global
+    if (!customer_id) {
+      return new Response(
+        JSON.stringify({ error: "customer_id is required" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
-    const { data: subscriptions, error } = await query;
+    
+    const { data: subscriptions, error } = await supabase
+      .from("push_subscriptions")
+      .select("*")
+      .eq("customer_id", customer_id);
 
     if (error) {
       console.error("Error fetching subscriptions:", error);
