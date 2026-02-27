@@ -108,11 +108,12 @@ const Catalog = () => {
         </div>
       </header>
 
+      {/* Hero Full Width */}
+      <section className="w-full animate-fade-in">
+        <HeroCarousel />
+      </section>
+      
       <main className="container py-6 space-y-8">
-        {/* Hero Carousel */}
-        <section className="animate-fade-in">
-          <HeroCarousel />
-        </section>
 
 
         {/* Promotions Section */}
