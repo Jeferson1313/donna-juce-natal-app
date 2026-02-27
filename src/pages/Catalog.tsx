@@ -98,7 +98,7 @@ const Catalog = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background gradient-festive">
+    <div className="min-h-screen bg-background gradient-festive overflow-x-hidden">
       {/* Header with Sidebar and Cart */}
       <header className="bg-card/80 backdrop-blur-md border-b border-border sticky top-0 z-30">
         <div className="container py-4 flex items-center justify-between">
@@ -109,10 +109,7 @@ const Catalog = () => {
       </header>
 
       <>
-        {/* HERO FORA DO CONTAINER */}
         <HeroCarousel />
-      
-        {/* CONTEÚDO DENTRO DO CONTAINER */}
         <div className="container mx-auto px-4">
           <ProductList />
         </div>
