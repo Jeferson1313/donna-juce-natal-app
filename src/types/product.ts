@@ -13,6 +13,14 @@ export interface Product {
   availability_type: "immediate" | "reservation";
   created_at: string;
   updated_at: string;
+
+  promotion_items?: {
+    promotional_price: number;
+    promotions?: {
+      is_active: boolean;
+      end_date: string | null;
+    } | null;
+  }[];
 }
 
 // For compatibility with existing ProductCard
@@ -30,11 +38,29 @@ export interface ProductDisplay {
 }
 
 export function toProductDisplay(product: Product): ProductDisplay {
+  const now = new Date();
+
+  const activePromotion = product.promotion_items?.find((item) => {
+    if (!item.promotions) return false;
+
+    const isActive = item.promotions.is_active;
+
+    const notExpired =
+      !item.promotions.end_date ||
+      new Date(item.promotions.end_date) > now;
+
+    return isActive && notExpired;
+  });
+
+  const finalPrice = activePromotion
+    ? Number(activePromotion.promotional_price)
+    : Number(product.price);
+
   return {
     id: product.id,
     name: product.name,
     description: product.description || "",
-    price: Number(product.price),
+    price: finalPrice,
     unit: product.unit,
     image: product.image_url || "/placeholder.svg",
     category: product.category,
