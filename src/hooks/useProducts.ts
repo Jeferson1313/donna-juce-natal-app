@@ -8,7 +8,16 @@ export function useProducts() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("*")
+        .select(`
+                  *,
+                  promotion_items (
+                    promotional_price,
+                    promotions (
+                      is_active,
+                      end_date
+                    )
+                  )
+                `)
         .order("order", { ascending: true });
 
       if (error) throw error;
