@@ -78,6 +78,7 @@ export type Database = {
           id: string
           name: string
           phone: string
+          role: string | null
           user_id: string
         }
         Insert: {
@@ -86,6 +87,7 @@ export type Database = {
           id?: string
           name: string
           phone: string
+          role?: string | null
           user_id: string
         }
         Update: {
@@ -94,6 +96,7 @@ export type Database = {
           id?: string
           name?: string
           phone?: string
+          role?: string | null
           user_id?: string
         }
         Relationships: []
@@ -282,6 +285,81 @@ export type Database = {
           reservation_type?: string
           unit?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      promotion_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string
+          promotion_id: string
+          promotional_price: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id: string
+          promotion_id: string
+          promotional_price?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          promotion_id?: string
+          promotional_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotion_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promotion_items_promotion_id_fkey"
+            columns: ["promotion_id"]
+            isOneToOne: false
+            referencedRelation: "promotions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promotions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          discount: number | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          start_date: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          discount?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          start_date?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          discount?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          start_date?: string | null
+          title?: string | null
         }
         Relationships: []
       }

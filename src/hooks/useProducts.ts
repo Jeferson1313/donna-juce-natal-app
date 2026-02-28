@@ -21,7 +21,7 @@ export function useProducts() {
         .order("order", { ascending: true });
 
       if (error) throw error;
-      return data as Product[];
+      return data as unknown as Product[];
     },
   });
 }
