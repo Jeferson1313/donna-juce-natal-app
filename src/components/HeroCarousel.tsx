@@ -34,12 +34,12 @@ export function HeroCarousel() {
 
   if (isLoading) {
     return (
-      <div className="w-full h-[300px] md:h-[400px] lg:h-[500px] bg-muted rounded-2xl animate-pulse" />
+      <div className="w-full h-[300px] md:h-[400px] lg:h-[500px] bg-muted animate-pulse" />
     );
   }
 
   return (
-    <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden rounded-2xl shadow-elevated">
+    <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden shadow-elevated">
       {slides.map((slide, index) => (
         <div
           key={slide.id}
