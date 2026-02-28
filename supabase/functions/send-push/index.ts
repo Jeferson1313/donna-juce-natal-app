@@ -24,7 +24,7 @@ serve(async (req) => {
   }
 
   try {
-    const { customer_id, title, body, link } = await req.json();
+    const { customer_id, to_admins, title, body, link } = await req.json();
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -42,21 +42,49 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // 🔒 Nunca permitir broadcast global
-    if (!customer_id) {
-      return new Response(
-        JSON.stringify({ error: "customer_id is required" }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+    let subscriptions: any[] | null = null;
+    let error: any = null;
+
+    if (to_admins) {
+      // Get admin user_ids
+      const { data: admins } = await supabase.from("admin_users").select("user_id");
+      const adminUserIds = admins?.map((a: any) => a.user_id) || [];
+
+      if (adminUserIds.length > 0) {
+        // Get customer records that belong to admin users
+        const { data: adminCustomers } = await supabase
+          .from("customers")
+          .select("id")
+          .in("user_id", adminUserIds);
+        
+        const adminCustomerIds = adminCustomers?.map((c: any) => c.id) || [];
+
+        if (adminCustomerIds.length > 0) {
+          const result = await supabase
+            .from("push_subscriptions")
+            .select("*")
+            .in("customer_id", adminCustomerIds);
+          subscriptions = result.data;
+          error = result.error;
+        } else {
+          subscriptions = [];
         }
+      } else {
+        subscriptions = [];
+      }
+    } else if (customer_id) {
+      const result = await supabase
+        .from("push_subscriptions")
+        .select("*")
+        .eq("customer_id", customer_id);
+      subscriptions = result.data;
+      error = result.error;
+    } else {
+      return new Response(
+        JSON.stringify({ error: "customer_id or to_admins is required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    const { data: subscriptions, error } = await supabase
-      .from("push_subscriptions")
-      .select("*")
-      .eq("customer_id", customer_id);
 
     if (error) {
       console.error("Error fetching subscriptions:", error);
@@ -84,7 +112,6 @@ serve(async (req) => {
         sent++;
       } catch (err: any) {
         console.error(`Push failed for ${sub.id}:`, err.statusCode || err.message);
-        // Remove expired/invalid subscriptions
         if (err.statusCode === 404 || err.statusCode === 410) {
           await supabase.from("push_subscriptions").delete().eq("id", sub.id);
           failed.push(sub.id);

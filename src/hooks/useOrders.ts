@@ -162,7 +162,7 @@ export function useCreateOrder() {
 
       if (itemsError) throw itemsError;
 
-      // Notify admin about new order
+      // Notify admins about new order
       try {
         const { data: customerData } = await supabase
           .from("customers")
@@ -172,6 +172,7 @@ export function useCreateOrder() {
 
         await supabase.functions.invoke("send-push", {
           body: {
+            to_admins: true,
             title: "🛒 Novo Pedido!",
             body: `${customerData?.name || "Cliente"} fez um pedido de R$ ${total.toFixed(2)}`,
             link: "/admin",
