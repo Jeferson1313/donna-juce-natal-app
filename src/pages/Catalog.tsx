@@ -109,13 +109,14 @@ const Catalog = () => {
         </div>
       </header>
 
-      <main className="container py-6 space-y-8">
-        {/* Hero Carousel */}
-        <section className="animate-fade-in">
+      <main className="py-6 space-y-8">
+        {/* Hero Carousel - full width */}
+        <section className="animate-fade-in -mt-6">
           <HeroCarousel />
         </section>
 
 
+        <div className="container space-y-8">
         {/* Promotions Section */}
         <PromotionSection
           onProductAction={(product) => {
@@ -263,6 +264,7 @@ const Catalog = () => {
             </p>
           </div>
         </section>
+        </div>
       </main>
 
       {/* WhatsApp Button */}
